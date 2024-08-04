@@ -19,10 +19,18 @@ practical_screen::practical_screen()
 {
 	init = true;
 	error = false;
+	show_textbox = false;
+	
 	MAX_ELEMENT = 100;
 	for (int i = 0; i < 100; i++)
 		array[i] = 0;
+	
 	errmsg = "";
+	
+	selector_x = GetScreenWidth()/20 - 5;
+	selector_y = GetScreenHeight()/20 - 5 + 40;
+	curr_element_num = 0;
+	delay = 5;
 }
 
 void practical_screen::draw_screen()
@@ -35,11 +43,44 @@ void practical_screen::draw_screen()
 		draw_error();
 	}
 	if (!error && !init) {
+		
+		DrawText("Press ENTER to select the option", 10, GetScreenHeight() - 45, 20, GREEN);
 
-		DrawText("Insert", GetScreenWidth() / 20, GetScreenHeight() / 20 + 40, 30, GREEN);
-		DrawText("Delete", GetScreenWidth() / 20, GetScreenHeight() / 20 + 40 * 2, 30, GREEN);
-		DrawText("Find", GetScreenWidth() / 20, GetScreenHeight() / 20 + 40 * 3, 30, GREEN);
-		DrawText("Size Reset", GetScreenWidth() / 20, GetScreenHeight() / 20 + 40 * 4, 30, GREEN);
+		DrawRectangle(selector_x, selector_y, 200, 40, GREEN);
+		
+		if (show_textbox) {
+			number.draw_textbox(selector_x + 220, selector_y, 100, 40, 30);
+		}
+
+		if (selector_y == GetScreenHeight() / 20 + 40 - 5) {
+			DrawText("Insert", GetScreenWidth() / 20, GetScreenHeight() / 20 + 40, 30, BLACK);
+		}
+		else{
+			DrawText("Insert", GetScreenWidth() / 20, GetScreenHeight() / 20 + 40, 30, GREEN);
+		}
+		
+		if (selector_y == GetScreenHeight() / 20 + 40 * 2 - 5) {
+			DrawText("Delete", GetScreenWidth() / 20, GetScreenHeight() / 20 + 40 * 2, 30, BLACK);
+		}
+		else {
+			DrawText("Delete", GetScreenWidth() / 20, GetScreenHeight() / 20 + 40 * 2, 30, GREEN);
+		}
+
+		if (selector_y == GetScreenHeight() / 20 + 40 * 3 - 5) {
+			DrawText("Find", GetScreenWidth() / 20, GetScreenHeight() / 20 + 40 * 3, 30, BLACK);
+		}
+		else
+		{
+			DrawText("Find", GetScreenWidth() / 20, GetScreenHeight() / 20 + 40 * 3, 30, GREEN);
+		}
+
+		if (selector_y == GetScreenHeight() / 20 + 40 * 4 - 5) {
+			DrawText("Size Reset", GetScreenWidth() / 20, GetScreenHeight() / 20 + 40 * 4, 30, BLACK);
+		}
+		else
+		{
+			DrawText("Size Reset", GetScreenWidth() / 20, GetScreenHeight() / 20 + 40 * 4, 30, GREEN);
+		}
 	}
 }
 
@@ -48,10 +89,51 @@ screen* practical_screen::update_screen()
 	if (init) {
 		update_init();
 		number.update_textbox();
-		}
+	}
 	if (error) {
 			update_error();
+	}
+	if (!error && !init) {
+		delay_handler();
+		number.update_textbox();
+
+		if (IsKeyPressed(KEY_ENTER) && delay >= 5) {
+			if (show_textbox == false) {
+				show_textbox = true;
+			}
+			else if(show_textbox == true){
+				number.reset_textbox();
+				show_textbox = false;
+			}
+			delay = 0;
 		}
+
+		if (IsKeyPressed(KEY_DOWN) && delay >= 5 && !show_textbox) {
+			if (selector_y == GetScreenHeight() / 20 + 40 - 5) {
+				selector_y = GetScreenHeight() / 20 + 40 * 2 - 5;
+			}
+			else if (selector_y == GetScreenHeight() / 20 + 40 * 2 - 5) {
+				selector_y = GetScreenHeight() / 20 + 40 * 3 - 5;
+			}
+			else if (selector_y == GetScreenHeight() / 20 + 40 * 3 - 5) {
+				selector_y = GetScreenHeight() / 20 + 40 * 4 - 5;
+			}
+			delay = 0;
+		}
+		
+		if (IsKeyPressed(KEY_UP) && delay >= 5 && !show_textbox) {
+			if (selector_y == GetScreenHeight() / 20 + 40 * 2 - 5) {
+				selector_y = GetScreenHeight() / 20 + 40 - 5;
+			}
+			else if (selector_y == GetScreenHeight() / 20 + 40 * 3 - 5) {
+				selector_y = GetScreenHeight() / 20 + 40 * 2 - 5;
+			}
+			else if (selector_y == GetScreenHeight() / 20 + 40 * 4 - 5) {
+				selector_y = GetScreenHeight() / 20 + 40 * 3 - 5;
+			}
+			delay = 0;
+		}
+	}
 	return this;
 }
 
@@ -69,6 +151,8 @@ void practical_screen::update_init()
 			errmsg = "YOU HAVE ENTERED A 0 FOR THE NUMBER\nOF ELEMENTS.SO THE PROGRAM WILL\nCONSIDER IT AS 10.";
 			error = true;
 		}
+		number.reset_textbox();
+		delay = 0;
 		init = false;
 	}
 }
@@ -85,7 +169,25 @@ void practical_screen::update_error()
 {
 	if (IsKeyPressed(KEY_SPACE)) {
 		MAX_ELEMENT = 12;
+		number.reset_textbox();
 		errmsg = "";
 		error = false;
+	}
+}
+
+bool practical_screen::isFULL()
+{
+	return curr_element_num == MAX_ELEMENT;
+}
+
+bool practical_screen::isEMPTY()
+{
+	return curr_element_num == 0;
+}
+
+void practical_screen::delay_handler()
+{
+	if (delay >= 0 && delay <= 5) {
+		delay++;
 	}
 }

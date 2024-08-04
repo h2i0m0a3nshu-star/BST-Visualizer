@@ -18,11 +18,14 @@ public:
 	screen* update_screen() override;
 private:
 	int MAX_ELEMENT;
-	int array[100];
+	int array[200];
+	int delay;
+	int selector_x, selector_y;
+	int curr_element_num;
 
 	const char* errmsg;
 
-	bool error, init;
+	bool error, init, show_textbox;
 
 	textbox number;
 
@@ -34,6 +37,10 @@ private:
 	void draw_error();
 	void update_error();
 
+	bool isFULL();
+	bool isEMPTY();
+
+	void delay_handler();
 };
 
 class theory_screen :public screen {
