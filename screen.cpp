@@ -21,7 +21,7 @@ practical_screen::practical_screen()
 	error = false;
 	show_textbox = false;
 	
-	MAX_ELEMENT = 100;
+	MAX_ELEMENT = 0;
 	for (int i = 0; i < 100; i++)
 		array[i] = 0;
 	
@@ -35,6 +35,7 @@ practical_screen::practical_screen()
 
 void practical_screen::draw_screen()
 {
+
 	if (init) {
 		draw_init();
 		number.draw_textbox(GetScreenWidth() / 6, GetScreenHeight() / 2 + 40, GetScreenWidth() / 3, 40 , 30);
@@ -86,6 +87,7 @@ void practical_screen::draw_screen()
 
 screen* practical_screen::update_screen()
 {
+	
 	if (init) {
 		update_init();
 		number.update_textbox();
@@ -102,7 +104,10 @@ screen* practical_screen::update_screen()
 				show_textbox = true;
 			}
 			else if(show_textbox == true){
-				number.reset_textbox();
+				if (selector_y == GetScreenHeight() / 20 + 40 - 5) {
+					error = INSERT(0);
+					errmsg = "FULL";
+				}
 				show_textbox = false;
 			}
 			delay = 0;
@@ -146,11 +151,12 @@ void practical_screen::draw_init()
 void practical_screen::update_init()
 {
 	if (IsKeyPressed(KEY_ENTER)) {
-		MAX_ELEMENT = number.get_stored_number();
-		if (MAX_ELEMENT == 0) {
+		
+		if (number.get_stored_number() <= 0) {
 			errmsg = "YOU HAVE ENTERED A 0 FOR THE NUMBER\nOF ELEMENTS.SO THE PROGRAM WILL\nCONSIDER IT AS 10.";
 			error = true;
 		}
+		MAX_ELEMENT = MAX_finder(number.get_stored_number());
 		number.reset_textbox();
 		delay = 0;
 		init = false;
@@ -168,21 +174,35 @@ void practical_screen::draw_error()
 void practical_screen::update_error()
 {
 	if (IsKeyPressed(KEY_SPACE)) {
-		MAX_ELEMENT = 12;
+		MAX_ELEMENT = 1022;
 		number.reset_textbox();
 		errmsg = "";
 		error = false;
 	}
 }
 
+int practical_screen::MAX_finder(int num)
+{
+	return (pow(2,num) - 2);
+}
+
 bool practical_screen::isFULL()
 {
-	return curr_element_num == MAX_ELEMENT;
+	return curr_element_num == MAX_ELEMENT || MAX_ELEMENT >= 10000;
 }
 
 bool practical_screen::isEMPTY()
 {
 	return curr_element_num == 0;
+}
+
+bool practical_screen::INSERT(int new_num)
+{
+	if (isFULL()) {
+		return true;
+	}
+
+	return false;
 }
 
 void practical_screen::delay_handler()

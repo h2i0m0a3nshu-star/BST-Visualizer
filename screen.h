@@ -1,6 +1,7 @@
 #pragma once
 #include "textbox.h"
 #include <raylib.h>
+#include <math.h>
 using namespace std;
 
 class screen {
@@ -18,7 +19,7 @@ public:
 	screen* update_screen() override;
 private:
 	int MAX_ELEMENT;
-	int array[200];
+	int array[10000];
 	int delay;
 	int selector_x, selector_y;
 	int curr_element_num;
@@ -37,8 +38,14 @@ private:
 	void draw_error();
 	void update_error();
 
+	int MAX_finder(int num);
+
 	bool isFULL();
 	bool isEMPTY();
+	bool INSERT(int new_num);
+	bool DELETE();
+	bool FIND();
+	bool SIZE_RESET(int num);
 
 	void delay_handler();
 };
