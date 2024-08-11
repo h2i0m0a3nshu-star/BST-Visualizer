@@ -79,6 +79,7 @@ int textbox::get_stored_number()
 void textbox::reset_textbox()
 {
 	num = 0;
+	curr = -1;
 	for (int i = 0; i < MAX; i++) {
 		number[i] = '\0';
 	}

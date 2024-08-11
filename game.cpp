@@ -45,7 +45,7 @@ void game::update() {
 		}
 	}
 
-	next_screen = next_screen->update_screen();
+	next_screen = curr_screen->update_screen();
 	if (next_screen != curr_screen) {
 		delete curr_screen;
 		curr_screen = next_screen;
